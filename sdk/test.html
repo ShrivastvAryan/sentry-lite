@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SentryLite Test Page</title>
+</head>
+<body>
+  <h1>SentryLite SDK Test</h1>
+
+  <button onclick="throwError()">Throw Error</button>
+  <button onclick="throwRejection()">Throw Unhandled Rejection</button>
+
+  <script src="sentry-lite.js"></script>
+  <script>
+    SentryLite.init({
+      dsn: '364d0f2b564cc2e9ef7597e1fb703c79ba4b590d', // your project's api_key
+    });
+
+    function throwError() {
+      undefinedFunction(); // will throw ReferenceError
+    }
+
+    function throwRejection() {
+      Promise.reject(new Error('Test unhandled rejection'));
+    }
+  </script>
+</body>
+</html>
