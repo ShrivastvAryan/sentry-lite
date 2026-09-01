@@ -1,16 +1,27 @@
 import hashlib
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status,generics, permissions
 from projects.models import Project
 from .models import Event, Issue
-from .serializers import EventIngestSerializer
+from .serializers import EventIngestSerializer, IssueSerializer
 
 
 def make_fingerprint(message, stack_trace):
     frames = stack_trace[:3] if stack_trace else []
     raw = message + ''.join(str(f) for f in frames)
     return hashlib.sha256(raw.encode()).hexdigest()
+
+class IssueListView(generics.ListAPIView):
+    serializer_class = IssueSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        project_id = self.kwargs['project_id']
+        return Issue.objects.filter(
+            project_id=project_id,
+            project__owner=self.request.user
+        ).order_by('-last_seen')
 
 
 class EventIngestView(APIView):
